@@ -1,0 +1,76 @@
+TARGET = paga
+TESTTARGET = ptest
+MODULES = raster.o super.o video.o rast_asm.o isr_asm.o videoasm.o paga.o events.o model.o renderer.o bitmaps.o input.o  isr.o  ikbd.o screen.o
+
+$(TARGET): $(MODULES)
+	cc68x -g $(MODULES) -o $(TARGET)
+
+$(TESTTARGET): $(MODULES)
+	cc68x -g $(MODULES) -o $(TEST_TARGET)
+
+music.o: music.c music.h
+	cc68x -g -c music.c
+
+psg.o: psg.c psg.h
+	cc68x -g -c psg.c
+
+effects.o: effects.c effects.h
+	cc68x -g -c effects.c
+
+bitmaps.o: bitmaps.c bitmaps.h defines.h
+	cc68x -g -c bitmaps.c
+
+screen.o: screen.c screen.h
+	cc68x -g -c screen.c
+
+raster.o: raster.c raster.h types.h defines.h
+	cc68x -g -c raster.c
+	
+events.o: EVENTS.C EVENTS.H defines.h
+	cc68x -g -c events.c
+
+model.o: MODEL.C MODEL.H types.h defines.h
+	cc68x -g -c model.c
+	
+renderer.o: RENDERER.C RENDERER.H raster.h BITMAPS.H defines.h types.h screen.h
+	cc68x -g -c renderer.c
+
+ikbd.o: ikbd.c ikbd.h input.h isr.h
+	cc68x -g -c ikbd.c
+
+input.o: input.c input.h VIDEO.H
+	cc68x -g -c input.c
+
+isr.o: isr.c isr.h ISR_ASM.H
+	cc68x -g -c isr.c
+
+video.o: video.c
+	cc68x -g -c video.c
+
+isr_asm.o: isr_asm.s
+	gen -D -L2 isr_asm.s
+
+rast_asm.o: rast_asm.s
+	gen -D -L2 rast_asm.s
+
+super.o: SUPER.S
+	gen -D -L2 super.s
+
+videoasm.o: VIDEOASM.s
+	gen -D -L2 videoasm.s
+
+$(TESTTARGET).o: $(TESTTARGET).c defines.h types.h input.h RENDERER.H EVENTS.H  MODEL.H
+	cc68x -g -c ptest.c
+	
+$(TARGET).o: $(TARGET).c defines.h types.h input.h RENDERER.H EVENTS.H MODEL.H isr.h ikbd.h VIDEO.H ISR_ASM.H
+	cc68x -g -c paga.c
+
+
+
+all:
+	make clean
+	make
+	
+clean:
+	Rm -f $(TARGET) *.o
+
